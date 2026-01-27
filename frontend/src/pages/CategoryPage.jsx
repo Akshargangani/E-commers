@@ -1,19 +1,97 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import ProductFilters from '../components/ProductFilters';
 import SortOptions from '../components/SortOptions';
 import Pagination from '../components/Pagination';
 import { useFilters } from '../hooks/useFilters';
-import { FiFilter, FiGrid, FiList, X } from 'react-icons/fi';
+import { FiFilter, FiGrid, FiList, X, ArrowLeft } from 'react-icons/fi';
 
-const Products = () => {
+const CategoryPage = () => {
+  const { category } = useParams();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
+
+  // Category configuration
+  const categoryConfig = {
+    mobile: {
+      name: 'Mobile Phones',
+      description: 'Latest smartphones with advanced features and cutting-edge technology',
+      icon: '📱'
+    },
+    tv: {
+      name: 'TV & Entertainment',
+      description: 'Smart TVs and entertainment systems for your home',
+      icon: '📺'
+    },
+    airpodes: {
+      name: 'AirPods & Earbuds',
+      description: 'Wireless audio solutions for music and calls',
+      icon: '🎧'
+    },
+    watches: {
+      name: 'Smart Watches',
+      description: 'Fitness tracking and smart features on your wrist',
+      icon: '⌚'
+    },
+    earphones: {
+      name: 'Earphones & Headphones',
+      description: 'Premium audio experience with noise cancellation',
+      icon: '🎵'
+    },
+    laptop: {
+      name: 'Laptops',
+      description: 'Powerful computing for work and gaming',
+      icon: '💻'
+    },
+    camera: {
+      name: 'Cameras',
+      description: 'Capture your memories with professional cameras',
+      icon: '📷'
+    },
+    speakers: {
+      name: 'Speakers',
+      description: 'High-quality sound systems for every occasion',
+      icon: '🔊'
+    },
+    refrigerator: {
+      name: 'Refrigerators',
+      description: 'Modern cooling solutions for your kitchen',
+      icon: '❄️'
+    },
+    mouse: {
+      name: 'Computer Mouse',
+      description: 'Precision pointing devices for work and gaming',
+      icon: '🖱️'
+    },
+    trimmers: {
+      name: 'Trimmers & Grooming',
+      description: 'Personal grooming and styling tools',
+      icon: '✂️'
+    },
+    processor: {
+      name: 'Processors',
+      description: 'High-performance CPUs for computing',
+      icon: '🔧'
+    },
+    printers: {
+      name: 'Printers',
+      description: 'Document printing and scanning solutions',
+      icon: '🖨️'
+    }
+  };
+
+  const currentCategory = categoryConfig[category] || {
+    name: category,
+    description: 'Browse our collection',
+    icon: '📦'
+  };
 
   // Use our custom filter hook
   const {
@@ -24,6 +102,13 @@ const Products = () => {
     activeFiltersCount,
     filterSummary
   } = useFilters(products);
+
+  // Set category filter
+  useEffect(() => {
+    if (category) {
+      updateFilters({ category: [category] });
+    }
+  }, [category]);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -170,17 +255,56 @@ const Products = () => {
       }
     ];
 
+    // Filter products by current category
+    const categoryProducts = mockProducts.filter(product => product.category === category);
+
     setTimeout(() => {
-      setProducts(mockProducts);
+      setProducts(categoryProducts);
       setLoading(false);
     }, 1000);
-  }, []);
+  }, [category]);
+
+  if (!categoryConfig[category]) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Category Not Found</h1>
+          <p className="text-gray-600 mb-8">The category you're looking for doesn't exist.</p>
+          <button
+            onClick={() => navigate('/products')}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Browse All Products
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Category Header */}
+      <div className="mb-8">
+        <button
+          onClick={() => navigate('/products')}
+          className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to All Products
+        </button>
+        
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-4xl">{currentCategory.icon}</span>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{currentCategory.name}</h1>
+            <p className="text-gray-600 mt-1">{currentCategory.description}</p>
+          </div>
+        </div>
+      </div>
+
       {/* Search Bar */}
       <div className="mb-8">
-        <SearchBar placeholder="Search for products, brands, categories..." />
+        <SearchBar placeholder={`Search ${currentCategory.name.toLowerCase()}...`} />
       </div>
 
       {/* Filter Summary */}
@@ -256,10 +380,9 @@ const Products = () => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <div>
-              <h1 className="text-2xl font-bold">All Products</h1>
-              <p className="text-gray-600 mt-1">
-                {filteredProducts.length} products found
-              </p>
+              <h2 className="text-xl font-semibold">
+                {filteredProducts.length} {currentCategory.name}
+              </h2>
             </div>
             
             <div className="flex items-center gap-4">
@@ -309,12 +432,12 @@ const Products = () => {
               {/* No Products Found */}
               {filteredProducts.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">No products found</p>
+                  <p className="text-gray-500 text-lg">No products found in this category</p>
                   <button
-                    onClick={clearFilters}
+                    onClick={() => navigate('/products')}
                     className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Clear Filters
+                    Browse Other Categories
                   </button>
                 </div>
               )}
@@ -339,4 +462,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default CategoryPage;

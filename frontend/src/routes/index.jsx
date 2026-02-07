@@ -5,7 +5,6 @@ import Login from '../pages/Login'
 import SignUp from '../pages/SignUp'
 import ForgotPassword from '../pages/ForgotPassword'
 import Products from '../pages/Products'
-import CategoryPage from '../pages/CategoryPage'
 import Cart from '../pages/Cart'
 import Checkout from '../pages/Checkout'
 import ProductDetail from '../pages/ProductDetail'
@@ -39,10 +38,6 @@ const router = createBrowserRouter([
             {
                 path : "/products",
                 element : <Products />
-            },
-            {
-                path : "/category/:category",
-                element : <CategoryPage />
             },
             {
                 path : "/product/:id",

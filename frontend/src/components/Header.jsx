@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Logo from './Logo'
-import SearchBar from './SearchBar'
+import { GrSearch } from "react-icons/gr";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link, useNavigate } from 'react-router-dom';
@@ -41,8 +41,15 @@ const Header = () => {
         </nav>
 
         {/* Search Bar */}
-        <div className='hidden lg:flex items-center flex-1 max-w-md mx-8'>
-          <SearchBar placeholder="Search products..." />
+        <div className='hidden lg:flex items-center w-full justify-between max-w-sm border-2 border-orange-200 rounded-full focus-within:shadow focus-within:border-orange-400 pl-2 bg-white/80 backdrop-blur'>
+          <input 
+            type="text" 
+            placeholder='search product here...' 
+            className='w-full outline-none pl-2 bg-transparent'
+          />
+          <div className='text-lg min-w-[50px] h-8 bg-gradient-to-r from-orange-400 to-pink-400 flex items-center justify-center rounded-r-full text-white'>
+            <GrSearch />
+          </div>
         </div>
 
         {/* User Actions */}
